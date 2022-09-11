@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import RestartButton from './RestartButton';
+import BoardsButtons from './BoardsButtons';
 import './TicTacToe.css';
 
 function TicTacToe() {
@@ -8,11 +9,15 @@ function TicTacToe() {
     JSON.parse(localStorage.getItem('cells')) || Array(9).fill('*')
   );
   const [victory, setVictory] = useState(false);
-
   const [enableRestart, setEnableRestart] = useState(true);
+  const [storedBoards, setStoredBoards] = useState(
+    JSON.parse(localStorage.getItem('storedBoards')) || [cells]
+  );
+  console.log(storedBoards);
 
   useEffect(() => {
     localStorage.setItem('cells', JSON.stringify(cells));
+    localStorage.setItem('storedBoards', JSON.stringify(storedBoards));
   }, [cells]);
 
   const checkForWinners = squares => {
@@ -70,6 +75,7 @@ function TicTacToe() {
     setCells(squares);
     checkForWinners(squares);
     setEnableRestart(false);
+    setStoredBoards(prevValue => [...prevValue, squares]);
   };
 
   const Cell = ({ num }) => {
@@ -102,6 +108,7 @@ function TicTacToe() {
           </tr>
         </tbody>
       </table>
+      <BoardsButtons boards={storedBoards.length} />
       <RestartButton
         disabled={enableRestart}
         handleClick={() => console.log(enableRestart)}
