@@ -11,14 +11,25 @@ function TicTacToe() {
   const [victory, setVictory] = useState(false);
   const [enableRestart, setEnableRestart] = useState(true);
   const [storedBoards, setStoredBoards] = useState(
-    JSON.parse(localStorage.getItem('storedBoards')) || [cells]
+    JSON.parse(localStorage.getItem('storedBoards')) || [[cells, turn]]
   );
-  console.log(storedBoards);
+  const [currentBoardId, setCurrentBoardId] = useState(0);
 
   useEffect(() => {
+    localStorage.setItem('currentPlayer', JSON.stringify(turn));
     localStorage.setItem('cells', JSON.stringify(cells));
     localStorage.setItem('storedBoards', JSON.stringify(storedBoards));
-  }, [cells]);
+  }, [cells, storedBoards]);
+
+  const handleRestart = () => {
+    setTurn('x');
+    setCells(Array(9).fill('*'));
+    localStorage.setItem('cells', JSON.stringify(cells));
+    setStoredBoards([[Array(9).fill('*'), 'x']]);
+    localStorage.setItem('storedBoards', JSON.stringify(storedBoards));
+    setVictory(false);
+    setCurrentBoardId(0);
+  };
 
   const checkForWinners = squares => {
     let combos = {
@@ -62,7 +73,32 @@ function TicTacToe() {
       return;
     }
 
+    setCurrentBoardId(storedBoards.length);
+
     let squares = [...cells];
+
+    if (currentBoardId !== storedBoards.length - 1) {
+      setCells(storedBoards[currentBoardId][0]);
+      squares = [...cells];
+      if (turn === 'x') {
+        squares[num] = 'x';
+        setTurn('o');
+      } else {
+        squares[num] = 'o';
+        setTurn('x');
+      }
+
+      setCells(squares);
+      checkForWinners(squares);
+      setEnableRestart(false);
+      setStoredBoards(prevValue => [
+        ...prevValue.slice(0, currentBoardId + 1),
+        [squares, turn],
+      ]);
+      setCurrentBoardId(storedBoards.length - 1);
+
+      return;
+    }
 
     if (turn === 'x') {
       squares[num] = 'x';
@@ -75,11 +111,21 @@ function TicTacToe() {
     setCells(squares);
     checkForWinners(squares);
     setEnableRestart(false);
-    setStoredBoards(prevValue => [...prevValue, squares]);
+    setStoredBoards(prevValue => [...prevValue, [squares, turn]]);
   };
 
   const Cell = ({ num }) => {
     return <td onClick={() => handleClick(num)}>{cells[num]}</td>;
+  };
+
+  const handleCurrentBoard = id => {
+    if (id === 0 || storedBoards[id][1] === 'o') {
+      setTurn('x');
+    } else {
+      setTurn('o');
+    }
+    setCells(storedBoards[id][0]);
+    setCurrentBoardId(id);
   };
 
   return (
@@ -108,10 +154,15 @@ function TicTacToe() {
           </tr>
         </tbody>
       </table>
-      <BoardsButtons boards={storedBoards.length} />
+      <BoardsButtons
+        boards={storedBoards.length}
+        handleCurrentBoard={handleCurrentBoard}
+        setCurrentBoardId={setCurrentBoardId}
+        activeId={currentBoardId}
+      />
       <RestartButton
         disabled={enableRestart}
-        handleClick={() => console.log(enableRestart)}
+        handleClick={() => handleRestart()}
         text={'Restart Button'}
       />
     </div>
