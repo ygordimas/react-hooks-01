@@ -1,4 +1,17 @@
 import React from 'react';
+import styled from 'styled-components';
+
+const ButtonWrapper = styled.div`
+  text-align: center;
+`;
+
+const Button = styled.button`
+  background: red;
+  width: 2rem;
+  height: 2rem;
+  padding: 0px;
+  margin-inline: 0.4rem;
+`;
 
 function BoardsButtons({
   boards,
@@ -9,7 +22,7 @@ function BoardsButtons({
   const buttons = Array(boards)
     .fill(null)
     .map((_, i) => (
-      <button
+      <Button
         key={i}
         onClick={() => {
           handleCurrentBoard(i);
@@ -18,9 +31,9 @@ function BoardsButtons({
         disabled={i == activeId}
       >
         {i}
-      </button>
+      </Button>
     ));
-  return <div>{buttons}</div>;
+  return <ButtonWrapper>{buttons}</ButtonWrapper>;
 }
 
 export default BoardsButtons;
