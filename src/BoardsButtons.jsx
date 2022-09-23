@@ -6,7 +6,7 @@ const ButtonWrapper = styled.div`
 `;
 
 const Button = styled.button`
-  background: red;
+  background: var(--accent);
   width: 2rem;
   height: 2rem;
   padding: 0px;

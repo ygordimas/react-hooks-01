@@ -1,12 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import RestartButton from './RestartButton';
 import BoardsButtons from './BoardsButtons';
-import './TicTacToe.css';
+import styled from 'styled-components';
+// import './TicTacToe.css';
+
+const StyledCell = styled.td`
+  padding: 0px;
+  text-align: center;
+  background: var(--light);
+  width: 12rem;
+  height: 12rem;
+  line-height: 12rem;
+  vertical-align: center;
+  text-transform: uppercase;
+  font-size: 8rem;
+  font-weight: 700;
+`;
+
+const StyledP = styled.p`
+  margin: 0 auto 0.6rem;
+  padding-bottom: 0.6rem;
+  text-align: center;
+  border-bottom: 1px solid black;
+`;
+
+const StyledRestart = styled.button`
+  margin: 0 auto;
+`;
 
 function TicTacToe() {
   const [turn, setTurn] = useState('x');
   const [cells, setCells] = useState(
-    JSON.parse(localStorage.getItem('cells')) || Array(9).fill('*')
+    JSON.parse(localStorage.getItem('cells')) || Array(9).fill('')
   );
   const [victory, setVictory] = useState(false);
   const [enableRestart, setEnableRestart] = useState(true);
@@ -14,6 +39,7 @@ function TicTacToe() {
     JSON.parse(localStorage.getItem('storedBoards')) || [[cells, turn]]
   );
   const [currentBoardId, setCurrentBoardId] = useState(0);
+  const [noVictory, setNoVictory] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('currentPlayer', JSON.stringify(turn));
@@ -21,14 +47,21 @@ function TicTacToe() {
     localStorage.setItem('storedBoards', JSON.stringify(storedBoards));
   }, [cells, storedBoards]);
 
+  const Cell = ({ num }) => {
+    return (
+      <StyledCell onClick={() => handleClick(num)}>{cells[num]}</StyledCell>
+    );
+  };
+
   const handleRestart = () => {
     setTurn('x');
-    setCells(Array(9).fill('*'));
+    setCells(Array(9).fill(''));
     localStorage.setItem('cells', JSON.stringify(cells));
-    setStoredBoards([[Array(9).fill('*'), 'x']]);
+    setStoredBoards([[Array(9).fill(''), 'x']]);
     localStorage.setItem('storedBoards', JSON.stringify(storedBoards));
     setVictory(false);
     setCurrentBoardId(0);
+    setNoVictory(false);
   };
 
   const checkForWinners = squares => {
@@ -52,9 +85,9 @@ function TicTacToe() {
     for (let combo in combos) {
       combos[combo].forEach(pattern => {
         if (
-          squares[pattern[0]] === '*' ||
-          squares[pattern[1]] === '*' ||
-          squares[pattern[2]] === '*'
+          squares[pattern[0]] === '' ||
+          squares[pattern[1]] === '' ||
+          squares[pattern[2]] === ''
         ) {
           //do nothing
         } else if (
@@ -62,13 +95,15 @@ function TicTacToe() {
           squares[pattern[1]] === squares[pattern[2]]
         ) {
           setVictory(true);
+        } else {
+          setNoVictory(true);
         }
       });
     }
   };
 
   const handleClick = num => {
-    if (cells[num] !== '*') {
+    if (cells[num] !== '') {
       alert('already clicked!');
       return;
     }
@@ -114,10 +149,6 @@ function TicTacToe() {
     setStoredBoards(prevValue => [...prevValue, [squares, turn]]);
   };
 
-  const Cell = ({ num }) => {
-    return <td onClick={() => handleClick(num)}>{cells[num]}</td>;
-  };
-
   const handleCurrentBoard = id => {
     if (id === 0 || storedBoards[id][1] === 'o') {
       setTurn('x');
@@ -129,12 +160,15 @@ function TicTacToe() {
   };
 
   return (
-    <div className="container">
-      {victory === true ? (
-        <p>Victory!</p>
+    <>
+      {noVictory === true ? (
+        <StyledP>Game Over! There were no winners.</StyledP>
+      ) : victory === true ? (
+        <StyledP>Victory!</StyledP>
       ) : (
-        <p>Player {turn.toUpperCase()}, it's your turn!</p>
+        <StyledP>Player {turn.toUpperCase()}, it's your turn!</StyledP>
       )}
+
       <table>
         <tbody>
           <tr>
@@ -165,7 +199,7 @@ function TicTacToe() {
         handleClick={() => handleRestart()}
         text={'Restart Button'}
       />
-    </div>
+    </>
   );
 }
 
