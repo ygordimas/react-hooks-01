@@ -15,6 +15,7 @@ const StyledCell = styled.td`
   text-transform: uppercase;
   font-size: 8rem;
   font-weight: 700;
+  border-radius: 8px;
 `;
 
 const StyledP = styled.p`
@@ -22,10 +23,8 @@ const StyledP = styled.p`
   padding-bottom: 0.6rem;
   text-align: center;
   border-bottom: 1px solid black;
-`;
-
-const StyledRestart = styled.button`
-  margin: 0 auto;
+  font-size: 2rem;
+  line-height: 2rem;
 `;
 
 function TicTacToe() {
@@ -95,7 +94,7 @@ function TicTacToe() {
           squares[pattern[1]] === squares[pattern[2]]
         ) {
           setVictory(true);
-        } else {
+        } else if (squares.filter(square => square == '').length === 0) {
           setNoVictory(true);
         }
       });
