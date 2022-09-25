@@ -8,14 +8,20 @@ const StyledCell = styled.td`
   padding: 0px;
   text-align: center;
   background: var(--light);
-  width: 12rem;
-  height: 12rem;
-  line-height: 12rem;
+  width: 8rem;
+  height: 8rem;
+  line-height: 4rem;
   vertical-align: center;
   text-transform: uppercase;
-  font-size: 8rem;
+  font-size: 4rem;
   font-weight: 700;
   border-radius: 8px;
+
+  &.enabled:hover {
+    background: var(--dark);
+    cursor: pointer;
+    border: 1px solid black;
+  }
 `;
 
 const StyledP = styled.p`
@@ -25,6 +31,7 @@ const StyledP = styled.p`
   border-bottom: 1px solid black;
   font-size: 2rem;
   line-height: 2rem;
+  font-weight: 600;
 `;
 
 function TicTacToe() {
@@ -44,11 +51,23 @@ function TicTacToe() {
     localStorage.setItem('currentPlayer', JSON.stringify(turn));
     localStorage.setItem('cells', JSON.stringify(cells));
     localStorage.setItem('storedBoards', JSON.stringify(storedBoards));
+
+    if (cells.filter(cell => cell == '').length === 0 && victory === false)
+      setNoVictory(true);
   }, [cells, storedBoards]);
+
+  useEffect(() => {
+    if (victory) setNoVictory(false);
+  }, [victory]);
 
   const Cell = ({ num }) => {
     return (
-      <StyledCell onClick={() => handleClick(num)}>{cells[num]}</StyledCell>
+      <StyledCell
+        className={cells[num] === '' ? 'enabled' : 'disabled'}
+        onClick={() => handleClick(num)}
+      >
+        {cells[num]}
+      </StyledCell>
     );
   };
 
@@ -94,11 +113,12 @@ function TicTacToe() {
           squares[pattern[1]] === squares[pattern[2]]
         ) {
           setVictory(true);
-        } else if (squares.filter(square => square == '').length === 0) {
-          setNoVictory(true);
         }
       });
     }
+
+    // console.log(`victory state: ${victory}`);
+    // console.log(`noVictory state: ${noVictory}`);
   };
 
   const handleClick = num => {
@@ -160,10 +180,13 @@ function TicTacToe() {
 
   return (
     <>
-      {noVictory === true ? (
-        <StyledP>Game Over! There were no winners.</StyledP>
-      ) : victory === true ? (
-        <StyledP>Victory!</StyledP>
+      {victory === true ? (
+        <StyledP>
+          Victory! Player '{(turn === 'x' ? 'o' : 'x').toUpperCase()}' is the
+          winner.
+        </StyledP>
+      ) : noVictory === true ? (
+        <StyledP>GAME OVER!</StyledP>
       ) : (
         <StyledP>Player {turn.toUpperCase()}, it's your turn!</StyledP>
       )}

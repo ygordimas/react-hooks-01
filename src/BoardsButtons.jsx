@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const ButtonWrapper = styled.div`
+  margin: 0.6rem auto 0;
   text-align: center;
 `;
 

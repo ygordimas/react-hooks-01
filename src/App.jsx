@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import TicTacToe from './TicTacToe.jsx';
 import { GlobalStyle } from './styles/global.js';
+import './App.css';
 
 function App() {
   return (
